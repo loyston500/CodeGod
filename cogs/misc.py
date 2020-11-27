@@ -70,6 +70,19 @@ class Misc(commands.Cog):
         LoystonLive#7925
         """
 
+    @commands.command(aliases=("upvote",))
+    async def vote(self, ctx):
+        """
+        USAGE:
+        ```py
+        vote|upvote
+        ```
+        ######
+        DESCRIPTION:
+        Gives the upvote link.
+        """
+        await ctx.send("You can upvote CodeGod using the link below\nhttps://top.gg/bot/748051917061619724")
+
     @commands.command(pass_context=True, description="Set trigger emoji [ADMIN ONLY]")
     @commands.has_permissions(administrator=True)
     async def setemoji(self, ctx):
