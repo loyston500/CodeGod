@@ -118,7 +118,7 @@ class CodeExecutorOnReact(commands.Cog):
         if reactor.bot:
             return
         if str(payload.emoji) == (
-            emoji := trigger_emojis.get(payload.guild_id, "▶️")
+            emoji := await trigger_emojis.get(payload.guild_id, "▶️")
         ):
             channel = self.client.get_channel(payload.channel_id)
             #if not channel.guild.me.guild_permissions.text.manage_messages:

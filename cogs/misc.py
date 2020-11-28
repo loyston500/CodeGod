@@ -105,10 +105,10 @@ class Misc(commands.Cog):
             await mes.delete()
         else:
             try:
-                if trigger_emojis.exists(ctx.message.guild.id):
-                    trigger_emojis.update(ctx.message.guild.id, str(reaction.emoji))
+                if await trigger_emojis.exists(ctx.message.guild.id):
+                    await trigger_emojis.update(ctx.message.guild.id, str(reaction.emoji))
                 else:
-                    trigger_emojis.insert(ctx.message.guild.id, str(reaction.emoji))
+                    await trigger_emojis.insert(ctx.message.guild.id, str(reaction.emoji))
             except Exception as err:
                 await ctx.send(f"Fatal error. {err}")
             else:

@@ -88,7 +88,7 @@ async def on_message(message):
     if not message.author.bot:
         if client.user in message.mentions:
             await message.channel.send(
-                f"Trigger emoji in this guild is set to {trigger_emojis.get(message.guild.id,'▶️')}\nBot Prefix: `cg.`"
+                f"Trigger emoji in this guild is set to {await trigger_emojis.get(message.guild.id,'▶️')}\nBot Prefix: `cg.`"
             )
         else:
             await client.process_commands(message)

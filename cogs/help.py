@@ -38,7 +38,7 @@ class Help(commands.Cog):
             )
             embed.add_field(
                 name="CODE EXECUTOR",
-                value=f"To run a code simply write a message with at least one code block. Make sure you lable it with valid language. Then react your message with {trigger_emojis.get(ctx.guild.id,'▶️')}. Boom! your code will be executed asap.\nFor additional help, run `cg.help <exec|eval|executor>`",
+                value=f"To run a code simply write a message with at least one code block. Make sure you lable it with valid language. Then react your message with {await trigger_emojis.get(ctx.guild.id,'▶️')}. Boom! your code will be executed asap.\nFor additional help, run `cg.help <exec|eval|executor>`",
                 inline=False,
             )
             embed.add_field(
