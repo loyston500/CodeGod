@@ -114,7 +114,7 @@ class CodeExecutorOnReact(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        reactor = self.client.get_user(payload.user_id)
+        reactor =  self.client.get_user(payload.user_id)
         if reactor.bot:
             return
         if str(payload.emoji) == (
@@ -147,7 +147,7 @@ class CodeExecutorOnReact(commands.Cog):
             except Exception as err:
                 await channel.send(f"Cannot parse the message. Reason:\n{err}")
             else:
-                await message.add_reaction("<a:RunningCode:749252623449718834>")
+                await message.add_reaction("<a:RunningCodeGrey:797304934151487558>")
                 if (blocks_len := len(blocks)) > 1:
                     # ask representes the message which asks the user to selects the codeblock to execute
                     ask_number = await channel.send(
@@ -181,26 +181,40 @@ class CodeExecutorOnReact(commands.Cog):
                     b = 0
                 try:
                     data.cooldown.add(payload.user_id)
-                    if "c" not in arg_params:
-                        rt_response, error_exist, stats = await rt.run(
-                            blocks[b]["code"], blocks[b]["lang"], "\n".join(inputs)
-                        )
-                    elif arg_params["c"] == "tio":
-                        if "l" in arg_params:
-                            rt_response, error_exist, stats = await tio.run(
-                                blocks[b]["code"], arg_params["l"], "\n".join(inputs)
-                            )
+                    if "getinputfrom" in arg_params:
+                        ext_input = ''
+                        try:
+                            ext_input = await channel.fetch_message(int(arg_params["getinputfrom"]))
+                        except:
+                            raise Exception("Failed to fetch the input.")
                         else:
-                            raise Exception("A language needs to be set.")
+                            ext_input = ext_input.content
                     else:
-                        raise Exception("Invalid compiler name.")
+                        ext_input = ''
+
+                    if "c" in arg_params:
+                        compiler_name = arg_params["c"]
+                        if compiler_name in {"rex", "rextester", "rextester.com"}:
+                            compiler = rt
+                        elif compiler_name in {"tio", "tio.run"}:
+                            compiler = tio
+                        else:
+                            raise Exception("Invalid compiler name.")
+                    else:
+                        compiler = rt
+
+                    lang = arg_params.get("l") or blocks[b]["lang"]
+
+                    rt_response, error_exist, stats = await compiler.run(
+                        blocks[b]["code"], lang, (ext_input or arg_params.get("i") or "\n".join(inputs))
+                    )
 
                 except Exception as err:
                     data.cooldown.remove(payload.user_id)
                     mes = await channel.send(err)
                     try:  # here too
                         await message.clear_reaction(
-                            "<a:RunningCode:749252623449718834>"
+                            "<a:RunningCodeGrey:797304934151487558>"
                         )
                     except:
                         pass
@@ -251,19 +265,28 @@ class CodeExecutorOnReact(commands.Cog):
                                     )
                                 )
                     if "clean" in arg_flags:
-                        mes = await channel.send(content=f"{reactor.mention}" + content, files=files)
+                        embed = None
+                        content = f"{content}@{reactor.name}"
+
                     else:
+                        # title="Jump to message",
+                        # url=message.jump_url,
                         embed = discord.Embed(
-                            title="Jump to message",
-                            url=message.jump_url,
                             color=color,
                             description=content,
                         )
                         embed.set_footer(text=stats + f" @{reactor.name}")
-                        mes = await channel.send(embed=embed, files=files)
+                        content = ""
+
+                    # the message is sent here, [changed send to reply]
+                    try:
+                        mes = await message.reply(embed=embed, content=content, files=files, mention_author=False)
+                    except:
+                        mes = await channel.send(embed=embed, content=content, files=files)
+
                     try:
                         await message.clear_reaction(
-                            "<a:RunningCode:749252623449718834>"
+                            "<a:RunningCodeGrey:797304934151487558>"
                         )
                     except:
                         pass
@@ -287,6 +310,9 @@ class CodeExecutorOnReact(commands.Cog):
                         await mes.clear_reaction("🗑️")
                     else:
                         await mes.delete()
+                finally:
+                    if payload.user_id in data.cooldown:
+                        data.cooldown.remove(payload.user_id)
 
 
 def setup(client):

@@ -19,7 +19,9 @@ else:
     TOKEN = os.getenv("DISCORD_TOKEN_DEBUG")
     print("Successfully set to debug.")
 
-client = commands.Bot(command_prefix="cg.", case_insensitive=True)
+intents = discord.Intents(messages=True, guilds=True, members=True, reactions=True)
+
+client = commands.Bot(command_prefix="cg.", case_insensitive=True, intents=intents)
 client.remove_command("help")
 
 loaded = load_extensions(client)
